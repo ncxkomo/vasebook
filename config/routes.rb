@@ -1,4 +1,6 @@
 Vasebook::Application.routes.draw do
+  devise_for :users
+
   resources :statuses
   root :to => "home#index"
 
