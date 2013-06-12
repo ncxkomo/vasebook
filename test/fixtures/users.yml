@@ -3,3 +3,9 @@ rydawg:
   last_name: "dawg"
   profile_name: "rydawg"
   email: "rydawg@rd.com"
+
+jimbo: 
+  first_name: "jim"
+  last_name: "bo"
+  profile_name: "jimbo"
+  email: "jimbo@jb.com"
