@@ -9,3 +9,9 @@ jimbo:
   last_name: "bo"
   profile_name: "jimbo"
   email: "jimbo@jb.com"
+
+mikey: 
+  first_name: "mike"
+  last_name: "ee"
+  profile_name: "mikey"
+  email: "mikey@mk.com"
