@@ -56,4 +56,64 @@ class UserFriendshipsControllerTest < ActionController::TestCase
             end
     	end
 	end
+
+    context "#create" do
+        context "when not logged in" do
+            should "redirect to the login page" do
+                post :create
+                assert_response :redirect
+                assert_redirected_to login_path
+            end
+        end
+
+        context "when logged in" do 
+            setup do 
+                sign_in users(:rydawg)
+            end
+
+            context "with no friend_id" do
+                setup do 
+                    post :create
+                end
+
+                should "set the flash error message" do
+                    assert !flash[:error].empty?
+                end
+
+                should "redirect to the site root" do
+                    assert_redirected_to root_path
+                end
+            end
+
+        context "with friend_id"
+            setup do
+                post :create, user_friendship: { friend_id: users(:mikey) }
+            end
+
+            should "assign a friend instance object" do
+                assert assigns(:friend)
+                assert_equal assigns(:friend), users(:mikey)
+            end
+
+            should "assign a user friendship instance object" do
+                assert assigns(:user_friendship)
+                assert_equal assigns(:user_friendship).user, users(:rydawg)
+                assert_equal assigns(:user_friendship).friend, users(:mikey)
+            end
+
+            should "create a friendship" do
+                assert users(:rydawg).friends.include?(users(:mikey))
+            end
+
+            should "redirect to profile page of friend" do 
+                assert_response :redirect
+                assert_redirected_to profile_path(users(:mikey))
+            end
+
+            should "set the flash message" do
+                assert flash[:success]
+                assert_equal flash[:success], "You are now friends with #{users(:mikey).full_name}."
+            end
+        end
+    end
 end
