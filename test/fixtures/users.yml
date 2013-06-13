@@ -3,6 +3,7 @@ rydawg:
   last_name: "dawg"
   profile_name: "rydawg"
   email: "rydawg@rd.com"
+  encrypted_password: "$2a$10$Fh/Hm8RxDsuPTeBUr6864.GARlcmt7zF2WspaXGr3BIv2C27N.osq" # "testing"
 
 jimbo: 
   first_name: "jim"
