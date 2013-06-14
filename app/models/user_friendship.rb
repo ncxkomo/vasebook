@@ -6,6 +6,7 @@ class UserFriendship < ActiveRecord::Base
 
 	state_machine :state, initial: :pending do    
 		after_transition on: :accept, do: [:send_acceptance_email]
+		
 
 		state :requested
 
