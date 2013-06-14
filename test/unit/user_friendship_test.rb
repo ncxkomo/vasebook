@@ -36,4 +36,15 @@ class UserFriendshipTest < ActiveSupport::TestCase
 			end
 		end
 	end
+
+	context "#accept!" do
+		setup do
+			@user_friendship = UserFriendship.create(user: users(:rydawg), friend: users(:mikey))
+		end
+
+		should "set the state to accepted" do
+			assert_equal @user_friendship.state, 'pending'
+		end
+		
+	end
 end
