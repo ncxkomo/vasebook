@@ -185,6 +185,7 @@ class UserFriendshipsControllerTest < ActionController::TestCase
 			setup do
 				@friend = create(:user)
 				@user_friendship = create(:pending_user_friendship, user: users(:rydawg), friend: @friend)
+	    		create(:pending_user_friendship, friend: users(:rydawg), user: @friend)
 				sign_in users(:rydawg)
 				put :accept, id: @user_friendship
 				@user_friendship.reload
@@ -232,8 +233,41 @@ class UserFriendshipsControllerTest < ActionController::TestCase
 			end
 
 			should "assign to friend" do
-    			assert assigns(:friend)
-  			end
+				assert assigns(:friend)
+			end
+		end
+	end
+
+	context "#destroy" do 
+		context "when not logged in" do
+			should "redirect to the login page" do
+				delete :destroy, id: 1 
+				assert_response :redirect
+				assert_redirected_to login_path
+			end
+		end
+
+		context "when logged in" do
+			setup do
+				@friend = create(:user)
+				@user_friendship = create(:accepted_user_friendship, friend: @friend, user: users(:rydawg)) 
+				create(:accepted_user_friendship, friend: users(:rydawg), user: @friend)
+
+				sign_in users(:rydawg)
+				@user_friendship.reload
+			end
+
+			should "delete user friendships" do
+				assert_difference 'UserFriendship.count', -2 do
+					delete :destroy, id: @user_friendship
+				end
+			end
+	
+			should "set the flash" do
+				delete :destroy, id: @user_friendship
+				assert_equal 'Friendship destroyed', flash[:success]
+			end
+
 		end
 	end
 end

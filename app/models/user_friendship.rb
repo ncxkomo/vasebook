@@ -4,6 +4,8 @@ class UserFriendship < ActiveRecord::Base
 
 	attr_accessible :user, :friend, :user_id, :friend_id, :state
 
+	after_destroy :delete_mutual_friendship!
+
 	state_machine :state, initial: :pending do    
 		after_transition on: :accept, do: [:send_acceptance_email, :accept_mutual_friendship!]
 		
@@ -42,5 +44,10 @@ class UserFriendship < ActiveRecord::Base
 	    # so as not to invoke callbacks.
 		mutual_friendship.update_attribute(:state, 'accepted')
 	end
+
+	def delete_mutual_friendship!
+	    mutual_friendship.delete
+  	end
+
 
 end
