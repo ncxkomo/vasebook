@@ -12,7 +12,7 @@ class UserFriendshipTest < ActiveSupport::TestCase
 
 	test "that creating a friendship on user id and friend id works" do 
 		UserFriendship.create(user_id: users(:rydawg).id, friend_id: users(:mikey).id)
-		assert users(:rydawg).friends.include?(users(:mikey))
+		assert users(:rydawg).pending_friends.include?(users(:mikey))
 	end
 
 	context "a new user_friendship instance" do
@@ -30,7 +30,7 @@ class UserFriendshipTest < ActiveSupport::TestCase
 			@user_friendship = UserFriendship.create(user: users(:rydawg), friend: users(:mikey))
 		end
 
-		should "send an email" do
+		should "send a request email" do
 			assert_difference('ActionMailer::Base.deliveries.size', 1) do
 				@user_friendship.send_request_email
 			end
@@ -43,8 +43,35 @@ class UserFriendshipTest < ActiveSupport::TestCase
 		end
 
 		should "set the state to accepted" do
-			assert_equal @user_friendship.state, 'pending'
+			@user_friendship.accept!
+			assert_equal @user_friendship.state, 'accepted'
 		end
-		
+
+		should "send an acceptance email" do
+			assert_difference('ActionMailer::Base.deliveries.size', 1) do
+				@user_friendship.accept!
+			end
+		end 
+
+		should "include new friend in user's list of friends" do
+			@user_friendship.accept!
+			users(:rydawg).friends.reload
+			assert users(:rydawg).friends.include?(users(:mikey))
+		end
+	end
+
+	context ".request" do
+		should "create two user friendships" do
+			assert_difference('UserFriendship.count', 2) do
+				UserFriendship.request(users(:rydawg), users(:mikey))
+			end
+		end
+
+		should "send a friend request email" do
+			assert_difference('ActionMailer::Base.deliveries.size', 1) do
+				UserFriendship.request(users(:rydawg), users(:mikey))
+			end
+		end
+
 	end
 end

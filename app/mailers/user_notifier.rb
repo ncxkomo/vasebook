@@ -9,4 +9,14 @@ class UserNotifier < ActionMailer::Base
   	mail to: @friend.email, 
   		subject: "#{@user.first_name} wants to be friends with you on Vasebook."
   end
+
+  def friend_accepted(user_friendship_id)
+  	@user_friendship = UserFriendship.find(user_friendship_id)
+  	@user = @user_friendship.user 
+  	@friend = @user_friendship.friend 
+
+  	mail to: @user.email, 
+  		subject: "#{@friend.first_name} has accepted your friendship!"
+  end
+
 end
