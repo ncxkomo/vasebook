@@ -60,4 +60,9 @@ class User < ActiveRecord::Base
     hash = Digest::MD5.hexdigest(downcase_email)
     "http://www.gravatar.com/avatar/#{hash}"
   end
+
+  def has_blocked?(other_user)
+    blocked_friends.include?(other_user)
+  end
+
 end
