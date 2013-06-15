@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class UserFriendshipsControllerTest < ActionController::TestCase
-	
 	context "#index" do
 		context "when not logged in" do
 			should "redirect to the login page" do
@@ -15,6 +14,8 @@ class UserFriendshipsControllerTest < ActionController::TestCase
 			setup do
 				@friendship1 = create(:pending_user_friendship, user: users(:rydawg), friend: create(:user, first_name: 'Pending', last_name: 'Friend'))
 				@friendship2 = create(:accepted_user_friendship, user: users(:rydawg), friend: create(:user, first_name: 'Accepted', last_name: 'Friend'))
+				@friendship3 = create(:requested_user_friendship, user: users(:rydawg), friend: create(:user, first_name: 'Requested', last_name: 'Friend'))
+				@friendship4 = user_friendships(:blocked_by_rydawg)
 				
 				sign_in users(:rydawg)
 				get :index
@@ -35,7 +36,7 @@ class UserFriendshipsControllerTest < ActionController::TestCase
 
 			should "display pending information on a pending friendship" do
 				assert_select "#user_friendship_#{@friendship1.id}" do 
-				  assert_select "em", "Friendship is pending."
+					assert_select "em", "Friendship is pending."
 				end
 			end
 
@@ -44,9 +45,84 @@ class UserFriendshipsControllerTest < ActionController::TestCase
 					assert_select "em", "Friendship started at #{@friendship2.updated_at}."
 				end
 			end
+			
+			context "blocked users" do
+				setup do
+					get :index, list: 'blocked'
+				end
+
+				should "get the index without error" do
+					assert_response :success
+				end
+
+				should "not display pending or active friends' names" do
+					assert_no_match /Pending\ Friend/, response.body # need to escape space
+					assert_no_match /Active\ Friend/, response.body 
+				end
+
+				should "display blocked friend names" do
+					assert_match /Blocked\ Friend/, response.body
+				end
+			end
+			
+			context "pending users" do
+				setup do
+					get :index, list: 'pending'
+				end
+
+				should "get the index without error" do
+					assert_response :success
+				end
+
+				should "not display blocked or active friends' names" do
+					assert_no_match /Blocked\ Friend/, response.body # need to escape space
+					assert_no_match /Active\ Friend/, response.body 
+				end
+
+				should "display pending friend names" do
+					assert_match /Pending\ Friend/, response.body
+				end
+			end
+
+			context "requested users" do
+				setup do
+					get :index, list: 'requested'
+				end
+
+				should "get the index without error" do
+					assert_response :success
+				end
+
+				should "not display blocked or active friends' names" do
+					assert_no_match /Blocked\ Friend/, response.body # need to escape space
+					assert_no_match /Active\ Friend/, response.body 
+				end
+
+				should "display requested friend names" do
+					assert_match /Requested/, response.body
+				end
+			end
+
+			context "accepted friendships" do
+				setup do
+					get :index, list: 'accepted'
+				end
+
+				should "get the index without error" do
+					assert_response :success
+				end
+
+				should "not display blocked or requested friends' names" do
+					assert_no_match /Blocked\ Friend/, response.body # need to escape space
+					assert_no_match /Requested\ Friend/, response.body 
+				end
+
+				should "display accepted friend names" do
+					assert_match /Accepted\ Friend/, response.body
+				end
+			end
 		end
 	end
-
 
 	context "#new" do
 		context "when not logged in" do
@@ -147,13 +223,13 @@ class UserFriendshipsControllerTest < ActionController::TestCase
 
 			should "assign a friend instance object" do
 				assert assigns(:friend)
-				assert_equal assigns(:friend), users(:mikey)
+				assert_equal users(:mikey), assigns(:friend) 
 			end
 
 			should "assign a user friendship instance object" do
 				assert assigns(:user_friendship)
-				assert_equal assigns(:user_friendship).user, users(:rydawg)
-				assert_equal assigns(:user_friendship).friend, users(:mikey)
+				assert_equal users(:rydawg), assigns(:user_friendship).user
+				assert_equal users(:mikey), assigns(:user_friendship).friend 
 			end
 
 			should "create a friendship" do
@@ -167,7 +243,7 @@ class UserFriendshipsControllerTest < ActionController::TestCase
 
 			should "set the flash message" do
 				assert flash[:success]
-				assert_equal flash[:success], "Friend request sent."
+				assert_equal "Friend request sent.", flash[:success] 
 			end
 		end
 	end
@@ -267,7 +343,6 @@ class UserFriendshipsControllerTest < ActionController::TestCase
 				delete :destroy, id: @user_friendship
 				assert_equal 'Friendship destroyed', flash[:success]
 			end
-
 		end
 	end
 

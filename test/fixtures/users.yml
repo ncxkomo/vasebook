@@ -16,3 +16,9 @@ mikey:
   last_name: "ee"
   profile_name: "mikey"
   email: "mikey@mk.com"
+
+blocked_friend:
+  first_name: 'Blocked'
+  last_name: 'Friend'
+  email: 'blocked@block.com'
+  profile_name: 'youblockedme'
