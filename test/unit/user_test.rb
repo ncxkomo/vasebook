@@ -3,6 +3,12 @@ require 'test_helper'
 class UserTest < ActiveSupport::TestCase
 	should have_many(:user_friendships)
 	should have_many(:friends)
+	should have_many(:pending_user_friendships)
+	should have_many(:pending_friends)
+	should have_many(:requested_user_friendships)
+	should have_many(:requested_friends)
+	
+
 
 	test "a user should enter a first name" do
 		user = User.new
@@ -33,8 +39,8 @@ class UserTest < ActiveSupport::TestCase
 	test "a user should have a profile name without spaces" do 
 		user = User.new(first_name: "trick", last_name: "shorty")
 		user.password = user.password_confirmation = 'afdsdsdsd'
-		
 		user.profile_name = "so many spaces"
+
 		assert !user.save
 		assert !user.errors[:profile_name].empty?
 

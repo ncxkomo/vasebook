@@ -71,7 +71,7 @@ class UserFriendshipTest < ActiveSupport::TestCase
 
 		should "set the state to accepted" do
 			@user_friendship.accept!
-			assert_equal @user_friendship.state, 'accepted'
+			assert_equal 'accepted', @user_friendship.state 
 		end
 
 		should "send an acceptance email" do
@@ -133,5 +133,22 @@ class UserFriendshipTest < ActiveSupport::TestCase
 			assert !UserFriendship.exists?(@friendship2.id) 
 		end
 	end
-end
 
+	context "#block!" do #block! is added by state machine once add state for it
+		setup do
+			@user_friendship = UserFriendship.request users(:rydawg), users(:mikey)
+		end
+		
+		should "set the state to blocked" do
+			@user_friendship.block!
+			assert_equal 'blocked', @user_friendship.state
+			assert_equal 'blocked', @user_friendship.mutual_friendship.state
+		end
+
+		should "not allow new requests once blocked" do
+			@user_friendship.block!
+			uf = UserFriendship.request users(:rydawg), users(:mikey)
+			assert !uf.save
+		end
+	end
+end
